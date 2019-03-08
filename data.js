@@ -7,7 +7,7 @@ const questions = [
   {
     type: 'input',
     name: 'input_files',
-    message: 'Insert the path to the source file(s) (separate multiple files them commas ","):'
+    message: 'Insert the path to the source file(s) (Space is a separator):\n'
   },
   {
     type: 'list',

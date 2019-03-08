@@ -24,7 +24,7 @@ cmd
   .option('-i, --interactive', 'Run in interactive mode')
   .action((file, otherFiles) => {
     let answers = {}
-    if (file) answers.input_files = [file]
+    if (file) answers.input_files = file
     else console.log(redError('Input file not found!'))
     if (otherFiles.length > 0) answers.input_files = [file].concat(otherFiles)
     if (cmd.stylesheet) answers.stylesheet_name = cmd.stylesheet
@@ -48,9 +48,15 @@ if (cmd.args.length <= 1) {
 
 function processSettings (s) {
   var files, style, format
-  if(typeof s.input_files === 'string') {
-    let inputAsArray = s.input_files.replace(' ', '').split(',')
+  if (typeof s.input_files === 'string') {
+    let inputAsArray = s.input_files.split(' ')
+    for (let i = 0; i < inputAsArray.length; i++) {
+      if (inputAsArray[i] === '') {
+        inputAsArray.splice(i, 1)
+      }
+    }
     s.input_files = inputAsArray
+    console.log(s.input_files)
   }
   files = s.input_files
   if (files.length < 1) return
@@ -87,10 +93,12 @@ function processSettings (s) {
 
 function interactiveMode () {
   console.log('')
-  console.log((chalk.white.bgRed(' ╔╦╗┌─┐┌┬┐┬ ┬╔╦╗╔╦╗ ')))
-  console.log((chalk.white.bgRed(' ║║║├─┤ │ ├─┤║║║ ║║ ')))
-  console.log((chalk.white.bgRed(' ╩ ╩┴ ┴ ┴ ┴ ┴╩ ╩═╩╝ ')))
+  console.log((chalk.white.bgRed('  ╔╦╗┌─┐┌┬┐┬ ┬╔╦╗╔╦╗ ')))
+  console.log((chalk.white.bgRed('  ║║║├─┤ │ ├─┤║║║ ║║ ')))
+  console.log((chalk.white.bgRed('  ╩ ╩┴ ┴ ┴ ┴ ┴╩ ╩═╩╝ ')))
+  console.log(chalk.bgWhite.black(' Use CTRL+C to exit. '))
   console.log('')
+
   const prompt = inq.createPromptModule()
   prompt(ops.questions).then(answers => {
     processSettings(answers)
@@ -137,31 +145,36 @@ function parseMathMD (
   for (let file of files) {
     /** Parser BEGIN */
     // Read the file data
-    fs.readFile(file, { encoding: 'utf-8' }, (err, data) => {
-      if (!err) {
-        // convert Markdown to HTML
-        let html = marked(data)
-        // Parse it with MathJax and return HTML
-        mjpage(html, ops.formulae.page, options.mathjax, (output) => {
-          // Process output
-          htmlPages.push(output)
-          fileCounter -= 1
-          if (fileCounter === 0) {
-            // Build the html file and minify it
-            let parsedHtml = minify(ops.buildHtml(trimExt(files[0]), htmlPages, options.stylesheet, options.author))
-            // Save html as file
-            let parsedFile = trimExt(files[0]) + '.html'
-            fs.writeFile(parsedFile, parsedHtml, (err) => {
-              if (err) redError(err)
-              let timeElapsed = Date.now() - timeStart
-              console.log(chalk.green(`[✅] Input file compiled into ${chalk.underline.white(parsedFile)} in ${timeElapsed}ms!`))
-              fileCounter = files.length
-              callback()
-            })
-          }
-        })
-      } else redError(err)
-    })
+    if (fs.existsSync(file)) {
+      fs.readFile(file, { encoding: 'utf-8' }, (err, data) => {
+        if (!err) {
+          // convert Markdown to HTML
+          let html = marked(data)
+          // Parse it with MathJax and return HTML
+          mjpage(html, ops.formulae.page, options.mathjax, (output) => {
+            // Process output
+            htmlPages.push(output)
+            fileCounter -= 1
+            if (fileCounter === 0) {
+              // Build the html file and minify it
+              let parsedHtml = minify(ops.buildHtml(trimExt(files[0]), htmlPages, options.stylesheet, options.author))
+              // Save html as file
+              let parsedFile = trimExt(files[0]) + '.html'
+              fs.writeFile(parsedFile, parsedHtml, (err) => {
+                if (err) redError(err)
+                let timeElapsed = Date.now() - timeStart
+                console.log(chalk.green(`[✅] Input file compiled into ${chalk.underline.white(parsedFile)} in ${timeElapsed}ms!`))
+                fileCounter = files.length
+                callback()
+              })
+            }
+          })
+        } else redError(err)
+      })
+    } else {
+      yellowAlert(`${chalk.underline.white(file)} doesn't exist, I'll ignore it... 😒`)
+      fileCounter -= 1
+    }
     /** Parser END */
     /**  Watch START */
     if (options.watch) {
