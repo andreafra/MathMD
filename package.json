@@ -1,0 +1,28 @@
+{
+  "name": "mathmd",
+  "version": "1.0.0",
+  "description": "A Markdown + LaTeX -> HTML parser.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Andrea Franchini",
+  "license": "MIT",
+  "dependencies": {
+    "browser-sync": "^2.26.3",
+    "chalk": "^2.4.2",
+    "commander": "^2.19.0",
+    "html-minifier": "^3.5.21",
+    "inquirer": "^6.2.2",
+    "marked": "^0.6.1",
+    "mathjax-node": "^2.1.1",
+    "mathjax-node-page": "^3.0.1",
+    "md5": "^2.2.1"
+  },
+  "bin": {
+    "mathmd": "./main.js"
+  },
+  "devDependencies": {
+    "standard": "^12.0.1"
+  }
+}
