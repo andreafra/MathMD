@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "A Markdown + LaTeX -> HTML parser.",
   "main": "main.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "Andrea Franchini",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/QUB3X/MathMD"
+  },
   "dependencies": {
     "browser-sync": "^2.26.3",
     "chalk": "^2.4.2",

@@ -220,3 +220,5 @@ function yellowAlert (msg) {
 function trimExt (file) {
   return file.replace(/\.[^/.]+$/, '')
 }
+
+exports.parseWithMathMD = parseMathMD
