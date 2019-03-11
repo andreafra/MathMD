@@ -196,29 +196,29 @@ function watchForChanges (files, options) {
     }
   })
 
-  // Excellent guide on watching for file changes here:
-  // https://thisdavej.com/how-to-watch-for-files-changes-in-node-js
+  let refresh = false
+  setInterval(async () => {
+    if (refresh) {
+      refresh = false
 
-  for (let file of files) {
-    let md5Previous = null
-    let fsWait = false
+      console.log(chalk.green(`[♻️ ] Detected change in the input file(s), compiling...`))
+      await parseMathMD(files, options)
+      bs.reload('*.html')
+    }
+  }, 1000)
 
-    // Start watcher
-    fs.watch(file, async (event, filename) => {
-      if (!filename || fsWait) return
-      fsWait = true // should queue it up instead
-      setTimeout(
-        () => { fsWait = false }
-        , 1000
-      )
+  let md5s = Array(files.length)
+  for (let i = 0; i < files.length; i++) {
+    // Excellent guide on watching for file changes here:
+    // https://thisdavej.com/how-to-watch-for-files-changes-in-node-js
 
-      const md5Current = md5(fs.readFileSync(file))
-      if (md5Current !== md5Previous) {
-        console.log(chalk.green(`[♻️ ] ${filename} file changed, compiling...`))
-        await parseMathMD(files, options)
-        bs.reload('*.html')
+    fs.watch(files[i], async (event, filename) => {
+      if (!filename) return
 
-        md5Previous = md5Current
+      const md5Current = md5(fs.readFileSync(files[i]))
+      if (md5Current !== md5s[i]) {
+        md5s[i] = md5Current
+        refresh = true
       }
     })
   }
