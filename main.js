@@ -20,89 +20,64 @@ const mjpage = (a, b, c) => new Promise((resolve, reject) => {
 const ops = require('./data')
 const DEFAULT_OPTS = {
   stylesheet: undefined,
-  author: 'Someone',
+  author: 'Anonymous',
   mathjax: ops.formulae.node
 }
 
+/* ======================= T H E   S H E L L ======================= */
 cmd
   .version('1.0.0')
-  .usage('[options] <file>')
-  .arguments('<input> [otherFiles...]')
-  .option('-a, --author [author]', 'specify an author (wrap it in quotes!)')
-  .option('-s, --stylesheet [stylesheet]', 'load a custom CSS for the file')
+  .usage('[options] <files ...>')
+  .option('-a, --author <author>', 'specify an author (wrap it in quotes!)')
+  .option('-s, --stylesheet <stylesheet>', 'load a custom CSS for the file')
   .option('-M, --mml', 'export with formulae in MathML')
   .option('-S, --svg', 'export with formulae as SVG')
   .option('-w, --watch', 'automatically compile when you save the file')
   .option('-i, --interactive', 'Run in interactive mode')
-  .action((file, otherFiles) => {
-    let answers = {}
-    if (file) answers.input_files = file
-    else console.log(redError('Input file not found!'))
-    if (otherFiles.length > 0) answers.input_files = [file].concat(otherFiles)
-    if (cmd.stylesheet) answers.stylesheet_name = cmd.stylesheet
-    if (cmd.mml) answers.output_format = 'MathML'
-    if (cmd.svg) answers.output_format = 'SVG'
-    answers.watch = cmd.watch
-    if (cmd.author) answers.author_name = cmd.author
-    else answers.author_name = 'MathMD Document'
-    if (cmd.interactive) interactiveMode()
-    else {
-      let settings = processSettings(answers)
-      run(settings.files, settings.options, settings.watch)
-    }
-  })
   .parse(process.argv)
 
-// If there are no args passed, ask the user
-// if it wants to do an interactive setup
-if (cmd.args.length <= 1) {
+// If there are no args passed, run as interactive shell
+if (cmd.args.length > 0) {
+  let settings = processSettings(cmd)
+  run(settings.files, settings.options, settings.watch)
+} else {
   console.log(chalk.yellow('[💡] If you run mathmd with no arguments/flags, it will run in interactive mode!'))
-
   interactiveMode()
 }
 
-function processSettings (s) {
-  var files, style, format
-  if (typeof s.input_files === 'string') {
-    let inputAsArray = s.input_files.split(' ')
-    for (let i = 0; i < inputAsArray.length; i++) {
-      if (inputAsArray[i] === '') {
-        inputAsArray.splice(i, 1)
-      }
-    }
-    s.input_files = inputAsArray
-    console.log(s.input_files)
-  }
-  files = s.input_files
-  if (files.length < 1) return
-  if (fs.existsSync(s.stylesheet_name)) {
+/* ======================= F U N C T I O N S ======================= */
+
+/**
+ * Process an object of options. Can take both argv and interactive answers
+ * @param {Object} input
+ */
+function processSettings (input) {
+  let ret = {}
+
+  ret.files = input.args || input.files.split(' ')
+  ret.watch = input.watch
+  ret.options = {}
+
+  // Stylesheet
+  if (input.stylesheet && fs.existsSync(input.stylesheet)) {
     console.log(chalk.green(`[✅] Custom CSS file found!`))
-    style = fs.readFileSync(s.stylesheet_name)
+    ret.options.stylesheet = fs.readFileSync(input.stylesheet)
   } else {
     yellowAlert('Custom stylesheet not found! Using default one...')
-    style = fs.readFileSync(path.join(__dirname, '/default.css'))
+    ret.options.stylesheet = fs.readFileSync(path.join(__dirname, '/default.css'))
   }
 
-  switch (s.output_format) {
-    case 'MathML':
-      format = { html: false, css: false, mml: true, svg: false }
-      break
-    case 'SVG':
-      format = { html: false, css: false, mml: false, svg: true }
-      break
-    default:
-      format = ops.formulae.node
-      break
+  // Output format
+  if (input.mml || input.format === 'MathML') {
+    ret.options.mathjax = { html: false, css: false, mml: true, svg: false }
+  } else if (input.svg || input.format === 'SVG') {
+    ret.options.mathjax = { html: false, css: false, mml: false, svg: true }
+  } else {
+    ret.options.mathjax = ops.formulae.node
   }
 
-  let ret = {}
-  ret.files = files
-  ret.watch = s.watch
-  ret.options = {
-    stylesheet: style,
-    author: s.author_name,
-    mathjax: format
-  }
+  // Author
+  ret.options.author = input.author || 'Anonymous'
 
   return ret
 }
