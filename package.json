@@ -10,12 +10,12 @@
     "url": "https://github.com/QUB3X/MathMD"
   },
   "dependencies": {
-    "browser-sync": "^2.26.3",
+    "browser-sync": "^2.26.7",
     "chalk": "^2.4.2",
     "commander": "^2.19.0",
     "html-minifier": "^3.5.21",
     "inquirer": "^6.2.2",
-    "marked": "^0.6.1",
+    "marked": "^0.7.0",
     "mathjax-node": "^2.1.1",
     "mathjax-node-page": "^3.0.1",
     "md5": "^2.2.1"
