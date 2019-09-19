@@ -93,5 +93,5 @@ For the LaTeX part, it's standard expressions and symbol, with support of AMS Ma
 - Integrated CSS with high readability ✔︎
 - Ebook friendly ✔︎
 - SVG or MathML for your expressions ✔︎
-- Expression reference (to be added) ✘
-- Figure captioning (to be added) ✘
+- Expression reference ✘
+- Figure captioning ✘
