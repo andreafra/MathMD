@@ -1,34 +1,27 @@
-/**
- * Pass parameters to set default values for questions
- * @returns Array of questions
- * @param {*} inputName The name the input file has
- */
 const questions = [
   {
     type: 'input',
-    name: 'input_files',
+    name: 'files',
     message: 'Insert the path to the source file(s) (Space is a separator):\n'
   },
   {
     type: 'list',
-    name: 'output_format',
+    name: 'format',
     message: 'Choose the output format for your formulae:',
     choices: [
-      'SVG',
-      'MathML'],
-    default: 2
+      'MathML',
+      'SVG'],
+    default: 0
   },
   {
     type: 'input',
-    name: 'stylesheet_name',
-    message: '[Optional] Insert a path to an external stylesheet:',
-    default: 'none'
+    name: 'stylesheet',
+    message: '[Optional] Insert a path to an external stylesheet:'
   },
   {
     type: 'input',
-    name: 'author_name',
-    message: '[Optional] Author:',
-    default: 'none'
+    name: 'author',
+    message: '[Optional] Author:'
   },
   {
     type: 'confirm',
@@ -37,6 +30,7 @@ const questions = [
     default: false
   }
 ]
+
 function buildHtml (title, pages, style, author) {
   return `<html>
 <head>
@@ -73,7 +67,6 @@ const minify = {
   removeComments: true,
   collapseWhitespace: true,
   conservativeCollapse: true
-
 }
 
 module.exports = {
