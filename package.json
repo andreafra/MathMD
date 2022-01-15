@@ -15,7 +15,7 @@
     "commander": "^2.19.0",
     "html-minifier": "^3.5.21",
     "inquirer": "^6.2.2",
-    "marked": "^0.7.0",
+    "marked": "^4.0.10",
     "mathjax-node": "^2.1.1",
     "mathjax-node-page": "^3.0.1",
     "md5": "^2.2.1",
